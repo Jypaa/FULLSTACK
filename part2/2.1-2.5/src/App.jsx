@@ -1,9 +1,11 @@
 import Course from './components/Course'
 
-const App = () => {
+const App = (props) => {
+  console.log(props)
+
   return (
     <div>
-      <Course/>
+      <Course course={props}/>
     </div>
   )
 }
