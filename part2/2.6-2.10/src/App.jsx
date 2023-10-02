@@ -1,18 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Persons from './components/person'
+import personService from './service/person'
 
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-1234567'},
-    { name: 'Ada Lovelace', number: '39-44-5323523'},
-    { name: 'Dan Abramov', number: '12-43-234345'},
-    { name: 'Mary Poppendieck', number: '39-23-6423122'}
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [showAll, setShowAll] = useState(true)
   const [search, setNewSearch] = useState('')
+
+  useEffect(() => {
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
+  }, [])
 
   const personToShow = showAll
   ? persons
@@ -35,9 +39,12 @@ const App = () => {
     
   }
 
-  const addName = (event) => {
+  const addPerson = (event) => {
     event.preventDefault()
-  
+    
+    console.log("kaikki",persons)
+    console.log("nimi",newName)
+
     let tosi = persons.some(person => person.name === newName)
     console.log("oliko", tosi)
     if(tosi===true){
@@ -45,16 +52,26 @@ const App = () => {
         alert(`${newName} is already added to phonebook`)
       )
     }
-    else{
+
+    else{    
       const personObject = {
-        name: newName,
-        number: newNumber}
-    
+      name: newName,
+      number: newNumber}
       setPersons(persons.concat(personObject))
       setNewName('')
-      setNewNumber('')
-      }
+      setNewNumber('')   
+      
+      personService
+      .create(personObject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+        
+      })
     }
+
+  }
 
   return (
     <div>  
@@ -63,7 +80,7 @@ const App = () => {
         filter by name: <input value={search} onChange={handleSearhChange} />
       </form>
       <h2>Add a new</h2>
-      <form onSubmit={addName}>
+      <form onSubmit={addPerson}>
       <div> name: <input value={App.newName} onChange={handlePersonChange}/></div>
         <div> number: <input value={newNumber} onChange={handleNumberChange}/></div>
         <div> <button type="submit">add</button></div>
