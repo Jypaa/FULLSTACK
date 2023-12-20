@@ -13,10 +13,14 @@ const create = newObject => {
   return request.then(response => response.data)
 }
 
-const update = (id, newObject) => {
-  const request = axios.put(`${baseUrl}/${id}`, newObject)
+const update = (id) => {
+  const request = axios.patch(`${baseUrl}/${id.id}`,
+  {
+    "number" : id.number
+  })
   return request.then(response => response.data)
 }
+
 const poista = (id)=> {
     const request = axios.delete(`${baseUrl}/${id}`)
     

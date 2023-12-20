@@ -41,12 +41,10 @@ const App = () => {
 
 
   const handlePersonChange = (event) => {
-    console.log(event.target.value)
     setNewName(event.target.value)
   }
 
   const handleNumberChange = (event) => {
-    console.log(event.target.value)
     setNewNumber(event.target.value)
   }
   
@@ -58,16 +56,30 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    
-    console.log("kaikki",persons)
-    console.log("nimi",newName)
 
     let tosi = persons.some(person => person.name === newName)
-    console.log("oliko", tosi)
     if(tosi===true){
+      if(newNumber != ''){
+        const person = persons.find(person => person.name === newName)
+        const personObject = {
+          id: person.id,
+          number: newNumber}  
+        setPersons([persons.pop(person)])
+
+        personService
+        .update(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson)) 
+          setNewName('')
+          setNewNumber('')
+        }
+      )
+      
+      }
+      else{
       return(
         alert(`${newName} is already added to phonebook`)
-      )
+      )}
     }
 
     else{    
