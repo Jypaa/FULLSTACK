@@ -3,10 +3,10 @@ const app = express()
 app.use(express.json())
 app.use(express.static('build'))
 var morgan = require('morgan')
-const cors = require('cors')
+//const cors = require('cors')
 //app.use(morgan(':method :url - :status - :response-time ms - :body - :res[content-length]'));
-app.use(cors())
-app.use(morgan(':method :url - :status - :response-time ms - :res[content-length]'));
+//app.use(cors())
+//app.use(morgan(':method :url - :status - :response-time ms - :res[content-length]'));
 
 let persons = [
   {
@@ -83,7 +83,7 @@ app.post('/api/persons', (request, response) => {
     persons = persons.concat(person)
   
     response.json(person)
-    morgan.token('body', request => JSON.stringify(request.body))
+    //morgan.token('body', request => JSON.stringify(request.body))
 })
 
 
