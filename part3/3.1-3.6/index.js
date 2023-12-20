@@ -3,8 +3,10 @@ const app = express()
 app.use(express.json())
 app.use(express.static('build'))
 var morgan = require('morgan')
-app.use(morgan(':method :url - :status - :response-time ms - :body - :res[content-length]'));
-
+const cors = require('cors')
+//app.use(morgan(':method :url - :status - :response-time ms - :body - :res[content-length]'));
+app.use(cors())
+app.use(morgan(':method :url - :status - :response-time ms - :res[content-length]'));
 
 let persons = [
   {
@@ -92,6 +94,6 @@ const generateId = () => {
     return maxId + 1
 }
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
