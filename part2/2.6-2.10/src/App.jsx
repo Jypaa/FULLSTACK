@@ -72,8 +72,19 @@ const App = () => {
           setPersons(persons.concat(returnedPerson)) 
           setNewName('')
           setNewNumber('')
-        }
-      )
+        } )
+        .catch(error => {
+          console.log(error)
+          setDeleteMessage(
+            `Person '${person.name}' was already removed from server`
+          )
+          setPersons(persons.filter(n => n.id !== person.id))
+        })
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+        
+     
       
       }
       else{

@@ -18,13 +18,24 @@ const update = (id) => {
   {
     "number" : id.number
   })
-  return request.then(response => response.data)
+  request.then(response => response.data)
+          .catch(error => {
+                    console.log('fail')
+                    return error
+                  })
+  return request
 }
 
 const poista = (id)=> {
     const request = axios.delete(`${baseUrl}/${id}`)
     
     return request.then(response => response.data)
+                  .catch(error => {
+                    console.log('fail')
+                    return error
+                  })
+                  
+
 
 }
 const muuttujat = {
