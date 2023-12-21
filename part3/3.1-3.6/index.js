@@ -13,23 +13,23 @@ const Person = require( './models/models.js')
 let persons = [
   {
     id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",    
+    name: 'Arto Hellas',
+    number: '040-123456',
   },
   {
     id: 2,
-    name: "Ada Lovalace",
-    number: "39-44-5323523",
+    name: 'Ada Lovalace',
+    number: '39-44-5323523',
   },
   {
     id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
+    name: 'Dan Abramov',
+    number: '12-43-234345',
   },
   {
     id: 4,
-    name: "Marry Poppendick",
-    number: "39-23-6423122",
+    name: 'Marry Poppendick',
+    number: '39-23-6423122',
   }
 ]
 
@@ -52,93 +52,93 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-    res.send(`Phonebook has info for ${persons.length} people<br><br> ${Date()}`)
-})  
+  res.send(`Phonebook has info for ${persons.length} people<br><br> ${Date()}`)
+})
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
-  .then(person => {
-    if (person) {
-      response.json(person)
-    } else {
-      response.status(404).end()
-    }
-  })
-  .catch(error => next(error));
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 app.patch('/api/persons/:id', (request, response, next) => {
-  const personId = request.params.id;
-  const { number } = request.body;
+  const personId = request.params.id
+  const { number } = request.body
 
   if (!number) {
-      return response.status(400).json({ 
-          error: 'Number missing' 
-      });
+    return response.status(400).json({
+      error: 'Number missing'
+    })
   }
 
   Person.findByIdAndUpdate(personId, { number }, { new: true })
-      .then(updatedPerson => {
-          if (!updatedPerson) {
-              return response.status(404).json({ 
-                  error: 'Person not found' 
-              });
-          }
+    .then(updatedPerson => {
+      if (!updatedPerson) {
+        return response.status(404).json({
+          error: 'Person not found'
+        })
+      }
 
-          console.log('Updated number for', updatedPerson.name, 'to', updatedPerson.number);
-          response.json(updatedPerson);
-      })
-      .catch(error => next(error));
-});
+      console.log('Updated number for', updatedPerson.name, 'to', updatedPerson.number)
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
+})
 
 app.delete('/api/persons/:id', (request, response, next) => {
-  const personId = request.params.id;
+  const personId = request.params.id
 
   Person.findByIdAndDelete(personId)
     .then(deletedPerson => {
       if (deletedPerson) {
-        response.json({ success: true, message: 'Person deleted successfully' });
+        response.json({ success: true, message: 'Person deleted successfully' })
       } else {
-        response.status(404).json({ success: false, message: 'Person not found' });
+        response.status(404).json({ success: false, message: 'Person not found' })
       }
     })
-    .catch(error => next(error));
+    .catch(error => next(error))
 })
 
 app.post('/api/persons',async (request, response, next)  => {
-  const body = request.body;
+  const body = request.body
   console.log('body', body)
 
   if (!body.name || !body.number) {
-      return response.status(400).json({ 
-          error: 'Name and/or number missing' 
-      });
+    return response.status(400).json({
+      error: 'Name and/or number missing'
+    })
   }
 
   await Person.findOne({ name: body.name })
-      .then(existingPerson => {
-          if (existingPerson) {
-              return response.status(400).json({ 
-                  error: 'Name must be unique' 
-              });
-          }
-          
-          const newPerson = new Person({
-              name: body.name,
-              number: body.number,
-          });
-          
-          
-          return newPerson.save();
-                
+    .then(existingPerson => {
+      if (existingPerson) {
+        return response.status(400).json({
+          error: 'Name must be unique'
+        })
+      }
+
+      const newPerson = new Person({
+        name: body.name,
+        number: body.number,
       })
 
-      .then(savedPerson => {
-          console.log('Added', savedPerson.name, 'number', savedPerson.number, 'to phonebook');
-          response.json(savedPerson);
-      })
-      .catch(error => next(error));
-});
+
+      return newPerson.save()
+
+    })
+
+    .then(savedPerson => {
+      console.log('Added', savedPerson.name, 'number', savedPerson.number, 'to phonebook')
+      response.json(savedPerson)
+    })
+    .catch(error => next(error))
+})
 
 app.use(unknownEndpoint)
 

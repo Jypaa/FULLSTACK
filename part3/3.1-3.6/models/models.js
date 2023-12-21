@@ -8,18 +8,18 @@ const personSchema = new mongoose.Schema({
     type: String,
     minlength: 3,
     required: true,
-    } , 
-    number: {
-      type: String,
-      validate: {
-        validator: (value) => {
-          const regex = /^(?:\d{2,3}-\d+)$/;
-          return regex.test(value) && value.length >= 8;
-        },
-        message: 'Invalid phone number format',
+  } ,
+  number: {
+    type: String,
+    validate: {
+      validator: (value) => {
+        const regex = /^(?:\d{2,3}-\d+)$/
+        return regex.test(value) && value.length >= 8
       },
-      required: true,
+      message: 'Invalid phone number format',
     },
+    required: true,
+  },
 })
 
 personSchema.set('toJSON', {
