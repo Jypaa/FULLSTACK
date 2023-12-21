@@ -53,9 +53,31 @@ const App = () => {
     setNewSearch(event.target.value)
     
   }
-
+  const validatePhoneNumber = (phoneNumber) => {
+    const regex = /^(?:\d{2,3}-\d+)$/;
+    
+    return regex.test(phoneNumber) && phoneNumber.length >= 8;
+  };
   const addPerson = async (event) => {
     event.preventDefault()
+    if(newName.length < 3){
+      setDeleteMessage(
+        `Person validation failed:name: ('${newName}')is shortes than the minimum allowed length (3).`
+      )
+      setTimeout(() => {
+        setDeleteMessage(null)
+      }, 5000)
+      return
+    }
+    if(validatePhoneNumber(newNumber)===false){
+      setDeleteMessage(
+        `Person validation failed:number: ('${newNumber}')is no allowed(atleat 8 digits and 2 or 3 number before -).`
+      )
+      setTimeout(() => {
+        setDeleteMessage(null)
+      }, 5000)
+      return
+    }
 
     let tosi = persons.some(person => person.name === newName)
     if(tosi===true){
