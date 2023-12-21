@@ -14,7 +14,7 @@ const App = () => {
   const [Message, setMessage] = useState(null)
   const [MessageDelete, setDeleteMessage] = useState(null)
 
-  useEffect(() => {
+  useEffect(()  => {
     personService
       .getAll()
       .then(initialPersons => {
@@ -54,7 +54,7 @@ const App = () => {
     
   }
 
-  const addPerson = (event) => {
+  const addPerson = async (event) => {
     event.preventDefault()
 
     let tosi = persons.some(person => person.name === newName)
@@ -66,7 +66,7 @@ const App = () => {
           number: newNumber}  
         setPersons([persons.pop(person)])
 
-        personService
+        await personService
         .update(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson)) 
@@ -78,7 +78,13 @@ const App = () => {
           setDeleteMessage(
             `Person '${person.name}' was already removed from server`
           )
-          setPersons(persons.filter(n => n.id !== person.id))
+          
+          })
+          personService
+          .getAll()
+          .then(initialPersons => {
+            setPersons(initialPersons)
+          
         })
         setTimeout(() => {
           setMessage(null)

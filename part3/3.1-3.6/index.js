@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 app.use(express.json())
+
 app.use(express.static('dist'))
 const mongoose = require('mongoose')
 require('dotenv').config()
@@ -36,6 +37,10 @@ let persons = [
   }
 ]
 
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
 app.get('/api/persons', (req, res) => {
   Person.find({}).then(result => {
     //console.log("Phonebook:")
@@ -55,10 +60,43 @@ app.get('/info', (req, res) => {
 })  
 
 app.get('/api/persons/:id', (request, response) => {
-  Person.findById(request.params.id).then(person => {
-    response.json(person)
+  Person.findById(request.params.id)
+  .then(person => {
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
   })
+  .catch(error => next(error));
 })
+
+app.patch('/api/persons/:id', (request, response) => {
+  const personId = request.params.id;
+  const { number } = request.body;
+
+  if (!number) {
+      return response.status(400).json({ 
+          error: 'Number missing' 
+      });
+  }
+
+  Person.findByIdAndUpdate(personId, { number }, { new: true })
+      .then(updatedPerson => {
+          if (!updatedPerson) {
+              return response.status(404).json({ 
+                  error: 'Person not found' 
+              });
+          }
+
+          console.log('Updated number for', updatedPerson.name, 'to', updatedPerson.number);
+          response.json(updatedPerson);
+      })
+      .catch(error => {
+          console.error('Error updating person:', error);
+          response.status(500).json({ error: 'Internal Server Error' });
+      });
+});
 
 app.delete('/api/persons/:id', (request, response) => {
   const personId = request.params.id;
@@ -71,13 +109,10 @@ app.delete('/api/persons/:id', (request, response) => {
         response.status(404).json({ success: false, message: 'Person not found' });
       }
     })
-    .catch(error => {
-      console.error("Error deleting person:", error);
-      response.status(500).json({ error: "Internal Server Error" });
-    });
+    .catch(error => next(error));
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body;
   console.log('body', body)
 
@@ -96,7 +131,6 @@ app.post('/api/persons', (request, response) => {
               });
           }
 
-        
           const newPerson = new Person({
               name: body.name,
               number: body.number,
@@ -106,14 +140,12 @@ app.post('/api/persons', (request, response) => {
       })
       .then(savedPerson => {
           console.log('Added', savedPerson.name, 'number', savedPerson.number, 'to phonebook');
-
           response.json(savedPerson);
       })
-      .catch(error => {
-          console.error('Error adding person:', error);
-          response.status(500).json({ error: 'Internal Server Error' });
-      });
+      .catch(error => next(error));
 });
+
+
 
 /*
 const generateId = () => {
@@ -122,6 +154,21 @@ const generateId = () => {
       : 0
     return maxId + 1
 }*/
+
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT)

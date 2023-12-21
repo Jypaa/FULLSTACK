@@ -13,11 +13,12 @@ const create = newObject => {
   return request.then(response => response.data)
 }
 
-const update = (id) => {
-  const request = axios.patch(`${baseUrl}/${id.id}`,
+const update = (id)  => {
+  const request =  axios.patch(`${baseUrl}/${id.id}`,
   {
     "number" : id.number
   })
+  
   request.then(response => response.data)
           .catch(error => {
                     console.log('fail')
