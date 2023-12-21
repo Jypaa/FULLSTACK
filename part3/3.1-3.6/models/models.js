@@ -4,8 +4,22 @@ const url = process.env.MONGODB_URI
 //console.log('connecting to', url)
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minlength: 3,
+    required: true,
+    } , 
+    number: {
+      type: String,
+      validate: {
+        validator: (value) => {
+          const regex = /^(?:\d{2,3}-\d+)$/;
+          return regex.test(value) && value.length >= 8;
+        },
+        message: 'Invalid phone number format',
+      },
+      required: true,
+    },
 })
 
 personSchema.set('toJSON', {
