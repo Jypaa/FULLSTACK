@@ -8,9 +8,11 @@ const exp = require('constants');
 const api = supertest(app)
 
 
+
 test('blogs are returned as json', async () => {
   const response = await api
     .get('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
   console.log('test',response.body)
@@ -19,6 +21,7 @@ test('blogs are returned as json', async () => {
 test('Check that returned blogs have id not __id', async () => {   
     const response = await api
     .get('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     expect(response.body[0].id).toBeDefined()    
@@ -27,6 +30,7 @@ test('Check that returned blogs have id not __id', async () => {
 test('Check that a new blog is added', async () => {
     const response = await api
     .get('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
 
 
     const newBlog = {
@@ -37,6 +41,8 @@ test('Check that a new blog is added', async () => {
     }
     const response2 = await api
     .post('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
+
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', 'application/json; charset=utf-8');
@@ -48,6 +54,8 @@ test('Check that a new blog is added', async () => {
 
     const response3 = await api
     .get('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
+
     expect(response3.body.length).toBe(response.body.length + 1)
 
 })
@@ -62,6 +70,7 @@ test('Check that a new blog is added with likes 0 if not defined', async () => {
 
     const response2 = await api
     .post('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', 'application/json; charset=utf-8');
@@ -79,6 +88,8 @@ test('Check that it wount post blog without author or url', async () => {
 
     const response2 = await api
     .post('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
+
     .send(newBlog)
     .expect(400)
 
@@ -96,14 +107,17 @@ test('Check that it will delete a blog', async () => {
     }
     const response2 = await api
     .post('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
     .send(newBlog)
 
     const id = response2.body.id
 
     const response3 = await api
     .delete(`/api/blogs/${id}`)
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
     .expect(204)
 })
+
 
 test('Check that it will update a blog', async () => {
 
@@ -115,6 +129,8 @@ test('Check that it will update a blog', async () => {
     }
     const response2 = await api
     .post('/api/blogs')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
+
     .send(newBlog)
 
     const id = response2.body.id
@@ -125,16 +141,16 @@ test('Check that it will update a blog', async () => {
 
     const response3 = await api
     .patch(`/api/blogs/${id}`)
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
     .send(updateBlog)
     .expect(204)
 
     const response4 = await api
     .get(`/api/blogs/${id}`)
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ')
     expect(response4.body.likes).toBe(2)
     
 })
-
-
 
 afterAll(async () => {
   await mongoose.connection.close()

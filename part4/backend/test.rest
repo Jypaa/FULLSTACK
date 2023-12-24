@@ -1,13 +1,82 @@
 GET http://localhost:3001/api/blogs
 
-###
+
+### invalid token
 
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
+Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEgdGVzdCIsImlkIjoiNjU4ODFmYTI3NWFjN2NjMzA5YWYxMDJhIiwiaWF0IjoxNzAzNDE5ODM5LCJleHAiOjE3MDM0MjM0Mzl9.jHdJML9K06s_hQevke20sSx1E_Blu5D7fYp96jFWJqw
 
 {
-    "title": "Test",
-    "author": "Test",
-    "url": "Test",
-    "likes": 0
+    "title": "Login test",
+    "author": "Login Test",
+    "url": "Login Test",
+    "likes": 0,
+    "userId" : "65880c9a047813c3d768c606"
 }
+### remember to change token
+
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMDI0OSwiZXhwIjoxNzAzNDIzODQ5fQ.OIY-QwU7WWtoRVce2NmDHnal3qwt7oQktM0uv0cWwp0
+
+{
+    "title": "Login test",
+    "author": "Login Test",
+    "url": "Login Test",
+    "likes": 0,
+    "userId" : "65880c9a047813c3d768c606"
+}
+
+###
+
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "username":"Jypa",
+    "name": "Jyri",
+    "password": "salainen"
+}
+
+###
+
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username":"Jypa",
+    "password": "salainen"
+}
+
+###
+
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "username":"Jypa test",
+    "name": "Jyri",
+    "password": "salainen"
+}
+
+###
+
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username":"Jypa test",
+    "password": "salainen"
+}
+
+###
+DELETE http://localhost:3001/api/blogs/65882e7e780026a12cbcb78d
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzQyMzk5MiwiZXhwIjoxNzAzNDI3NTkyfQ.33Xin9-0K4vxnTndzLagBoD258aTZxAfkKPI8FDwOaQ
+
+### Invalid token
+
+DELETE http://localhost:3001/api/blogs/65882e7e780026a12cbcb78d
+Content-Type: application/json
+Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEgdGVzdCIsImlkIjoiNjU4ODFmYTI3NWFjN2NjMzA5YWYxMDJhIiwiaWF0IjoxNzAzNDE5ODM5LCJleHAiOjE3MDM0MjM0Mzl9.jHdJML9K06s_hQevke20sSx1E_Blu5D7fYp96jFWJqw
