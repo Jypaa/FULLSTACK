@@ -18,6 +18,7 @@ test('Check that a new user with existing username wount be added', async () => 
     
     const response2 = await api
     .post('/api/users')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzU5ODAzNywiZXhwIjoxNzAzNjAxNjM3fQ.6mIsEowvsUM_GVUtLdMSRGjcgoIoWqeOsQEIMC1Z8tU')
     .send(newUser)
     .expect(400)
     .expect('Content-Type', 'application/json; charset=utf-8');
@@ -37,6 +38,7 @@ test('Check that username cant be too short', async () => {
 
     const response2 = await api
     .post('/api/users')
+    .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGEiLCJpZCI6IjY1ODgwYzlhMDQ3ODEzYzNkNzY4YzYwNiIsImlhdCI6MTcwMzU5ODAzNywiZXhwIjoxNzAzNjAxNjM3fQ.6mIsEowvsUM_GVUtLdMSRGjcgoIoWqeOsQEIMC1Z8tU')
     .send(newUser)
     .expect(400)
     .expect('Content-Type', 'application/json; charset=utf-8');
@@ -44,3 +46,4 @@ test('Check that username cant be too short', async () => {
     expect(response2.body.error).toBe("invalid username or password")
 
 })
+

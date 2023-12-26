@@ -29,20 +29,28 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 const userExtractor = async (request, response, next) => {
-  const token = request.headers.authorization.split(" ")[1];
-  const decodedToken = jwt.verify(token, process.env.SECRET,)
-  if (!token || !decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
+  if(request.headers.authorization){
+    console.log('request.headers.authorization',request.headers.authorization)
+    const token = request.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.SECRET,)
+    if (!token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+    const user = decodedToken.id
+    request.user = user
+    next()
   }
-  const user = decodedToken.id
-  request.user = user
-  next()
 }
 
 const tokenExtractor = (request, response, next) => {
-  const token = request.headers.authorization.split(" ")[1];
-  request.token = token;
-  next();
+  if(request.headers.authorization){
+    const token = request.headers.authorization.split(" ")[1];
+    request.token = token;
+    next();
+  }
+  else{
+    next()
+  }
 };
 
 module.exports = {
