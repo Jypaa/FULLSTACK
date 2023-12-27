@@ -65,7 +65,9 @@ blogsRouter.delete("/:id", async (request, response, next) => {
 })
 
 blogsRouter.patch("/:id", async (request, response, next) => {
-  await Blog.findByIdAndUpdate(request.params.id, request.body)
+  updatekeys = Object.keys(request.body).toString()
+  updatevalues = parseInt(Object.values(request.body),10)
+  await Blog.findByIdAndUpdate(request.params.id, {$set:{[updatekeys]: updatevalues}},{new: true})
   response.status(204).end()
 })
 
