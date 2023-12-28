@@ -3,7 +3,8 @@ module.exports = {
   env: {
     browser: true,
     es2020: true,
-    "jest/globals": true
+    "jest/globals": true,
+    "cypress/globals": true
   },
   extends: [
     'eslint:recommended',
@@ -39,6 +40,9 @@ module.exports = {
     ],
     "arrow-spacing": [
         "error", { "before": true, "after": true }
+    ],
+    "plugins": [
+      "react", "jest", "cypress"
     ],
     "no-console": 0,
     "react/prop-types": 0,

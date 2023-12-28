@@ -14,26 +14,26 @@ const BlogForm = ({
       <form onSubmit={handleSubmit}>
         <div>
         title
-          <input
+          <input className='title'
             value={title}
             onChange={handleTitleChange}
           />
         </div>
         <div>
         author
-          <input
+          <input className='author'
             value={author}
             onChange={handleAuthorChange}
           />
         </div>
         <div>
         url
-          <input
+          <input className='url'
             value={url}
             onChange={handleUrlChange}
           />
         </div>
-        <button type="submit" >create</button>
+        <button className='create' type="submit" >create</button>
       </form>
     </div>
   )
@@ -48,6 +48,5 @@ BlogForm.propTypes = {
   author: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired
 }
-
 
 export default BlogForm

@@ -10,16 +10,16 @@ const LoginForm = ({
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div >
           username
-          <input
+          <input className='username'
             value={username}
             onChange={handleUsernameChange}
           />
         </div>
         <div>
           password
-          <input
+          <input className='password'
             value={password}
             onChange={handlePasswordChange}
           />

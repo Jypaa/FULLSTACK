@@ -49,7 +49,7 @@ const Blog = ({ blog, updateBlog}) => {
         <p>{blog.url}</p>
         <p>
           Likes: {blog.likes}
-          <button onClick={addVote}>vote</button>
+          <button className='vote' onClick={addVote}>vote</button>
         </p>
         <p>User: {blog.user.name}</p>
 

@@ -119,7 +119,7 @@ const  sorting = (blogs) => {
     return (
       <div>
         <div style={hideWhenVisible}>
-          <button onClick={() => setBlogVisible(true)}>create new</button>
+          <button className='newBlog' onClick={() => setBlogVisible(true)}>create new</button>
         </div>
         <div style={showWhenVisible}>
           <BlogForm
@@ -131,6 +131,7 @@ const  sorting = (blogs) => {
             handleUrlChange={({ target }) => setUrl(target.value)}
             handleSubmit={handleBlog}
           />
+          
           <button onClick={() => setBlogVisible(false)}>cancel</button>
         </div>
       </div>
@@ -198,7 +199,7 @@ const  sorting = (blogs) => {
 
       <button type="submit" onClick={handlelogout}>logout</button>
 
-      <h2>create new</h2>
+      <h2>add new blog</h2>
       <Notification message={Message} />
       {blogForm()}
 
