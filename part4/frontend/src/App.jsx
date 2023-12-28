@@ -5,6 +5,7 @@ import loginService from './services/login'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
+import { set } from 'mongoose'
 
 
 const App = () => {
@@ -20,18 +21,27 @@ const App = () => {
   const [loginVisible, setLoginVisible] = useState(false)
   const [BlogVisible, setBlogVisible] = useState(false)
 
-  useEffect(async () => {
-    if(window.localStorage.token) {
-      const blogs = await blogService.getAll()
-      await sorting(blogs)
-      setBlogs(blogs)
 
-    }
-  }, [])
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        if (window.localStorage.token) {
+          const blogs = await blogService.getAll();
+          sorting(blogs);
+          setBlogs(blogs);
+        }
+      } catch (error) {
+        console.error('Error fetching blogs:', error);
+      }
+    };
+  
+    fetchBlogs();
+  }, []);
 
 const  sorting = (blogs) => {
     blogs.sort((a, b) => b.likes - a.likes)
   }
+
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
@@ -57,6 +67,27 @@ const  sorting = (blogs) => {
       }, 5000)
     }
   }
+
+  const updateBlog = async (updatedBlogId) => {
+    try {
+      const blog = blogs.find((blog) => blog.id === updatedBlogId);
+      console.log('index',blog)
+      const updatedLikes = blog.likes + 1;
+    await setBlogs((prevBlogs) => {
+      const updatedBlogs = [...prevBlogs];
+      const index = updatedBlogs.findIndex((b) => b.id === updatedBlogId);
+      if (index !== -1) {
+        updatedBlogs[index] = { ...updatedBlogs[index], likes: updatedLikes };
+      }
+      sorting(updatedBlogs)
+      return updatedBlogs;
+    });
+      
+    } catch (error) {
+      console.error('Error updating blog:', error);
+    }
+  };
+
   const handleBlog = async (event) => {
     event.preventDefault()
     try {
@@ -108,7 +139,7 @@ const  sorting = (blogs) => {
   }
 
 
-  const handlelogout = async (event) => {
+  const handlelogout = (event) => {
     event.preventDefault()
     try {
       window.localStorage.removeItem('token')
@@ -121,6 +152,7 @@ const  sorting = (blogs) => {
       console.log('error',exception)
     }
   }
+
   const loginForm = () => {
     const hideWhenVisible = { display: loginVisible ? 'none' : '' }
     const showWhenVisible = { display: loginVisible ? '' : 'none' }
@@ -145,8 +177,8 @@ const  sorting = (blogs) => {
 
 
   }
-
-  if (window.localStorage.token === null) {
+  
+  if (window.localStorage.token === null || window.localStorage.token === undefined) {
 
     return (
       <div>
@@ -157,7 +189,7 @@ const  sorting = (blogs) => {
       </div>
     )
   }
-
+  
   return (
 
     <div>
@@ -172,13 +204,14 @@ const  sorting = (blogs) => {
 
 
       <h2>blogs</h2>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+      {Array.isArray(blogs) && blogs.map(blog =>
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
       )}
 
 
     </div>
-  )}
+  )
+}
 
 
 export default App

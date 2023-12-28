@@ -16,7 +16,7 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
-const create = async blog => {
+const create = blog => {
   const config = {
     headers: { Authorization: 'Bearer ' + JSON.parse(window.localStorage.getItem('token')) },
   }

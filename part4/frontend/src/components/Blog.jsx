@@ -2,7 +2,7 @@ import { useState } from 'react'
 import blogService from '../services/blogs'
 
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, updateBlog}) => {
   const [BlogVisible, setBlogVisible] = useState(false)
 
   const blogStyle = {
@@ -13,14 +13,15 @@ const Blog = ({ blog }) => {
     marginBottom: 5
   }
 
-  const addVote = async () => {
-    await blogService.update(blog.id,{ likes: blog.likes + 1, })
-
+  const addVote = () => {
+    blogService.update(blog.id,{ likes: blog.likes + 1, })
+    
+    updateBlog(blog.id);
   }
 
-  const deleteBlog = async () => {
+  const deleteBlog = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      await blogService.remove(blog.id)
+      blogService.remove(blog.id)
       setBlogVisible(false)
 
     }
@@ -28,16 +29,19 @@ const Blog = ({ blog }) => {
 
   if (BlogVisible === false) {
     return (
-      <div style={blogStyle}>
+       
+      <div style={blogStyle} className='blog'>
         <p>
           {blog.title} {blog.author}{' '}
           <button onClick={() => setBlogVisible(true)}>Show</button>
         </p>
       </div>
+
     )
   } else {
     return (
-      <div style={blogStyle}>
+
+      <div style={blogStyle} className='blog'>
         <p>
           {blog.title} {blog.author}{' '}
           <button onClick={() => setBlogVisible(false)}>Hide</button>
@@ -53,6 +57,7 @@ const Blog = ({ blog }) => {
           <p><button onClick={deleteBlog}>Remove</button></p>) : ('')}
 
       </div>
+
     )
   }
 }
