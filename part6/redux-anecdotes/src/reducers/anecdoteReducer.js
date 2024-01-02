@@ -16,9 +16,6 @@ const asObject = (anecdote) => {
     votes: 0
   }
 }
-const  sorting = (anecdote) => {
-  anecdote.sort((a, b) => b.votes - a.votes)
-}
 
 const initialState = anecdotesAtStart.map(asObject)
 
