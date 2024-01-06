@@ -64,42 +64,86 @@ const Footer = () => (
   </div>
 )
 
-const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
 
+const useField = (type) => {
+  const [value, setValue] = useState('')
+
+  const onChange = (event) => {
+    setValue(event.target.value)
+  }
+
+  const reset = () => {
+    setValue('');
+  };
+
+  return {
+    type,
+    value,
+    onChange,
+    reset
+  }
+}
+
+const CreateNew = (props) => {
+  const author = useField('author')
+  const content = useField('content')
+  const info = useField('info')
   const Navigate = useNavigate()
 
   const handleSubmit = (e) => {
+    if (e.nativeEvent.submitter && e.nativeEvent.submitter.type === 'button' && e.nativeEvent.submitter.name === 'reset') {
+      return;
+    }
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
-    })
+
+    }
+    )
     Navigate('/anecdotes')
     
   }
-
+  const handleReset = () => {
+    author.reset();
+    content.reset();
+    info.reset();
+  };
   return (
     <div>
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input 
+          type={content.type} 
+          value={content.value}
+          onChange={content.onChange}
+          
+          />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input 
+          type={author.type} 
+          value={author.value}
+          onChange={ author.onChange}
+          
+          />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input 
+          type={info.type} 
+          value={info.value}
+          onChange={ info.onChange}
+          
+          />
         </div>
         <button>create</button>
+        <button type="button" onClick={handleReset}>reset</button>
       </form>
     </div>
     
@@ -130,7 +174,7 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
-    setNotification(`a new anecdote ${anecdote.content} created`)
+    setNotification(`a new anecdote ${anecdote.content.value} created`)
     setTimeout(() => setNotification(''), 5000)
   }
 
@@ -162,7 +206,7 @@ const App = () => {
       <div>
         {notification}
       </div>
-      
+
       <Routes>
         <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path="/anecdotes/" element={<AnecdoteList anecdotes={anecdotes} />} />
