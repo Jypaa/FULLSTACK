@@ -2,45 +2,111 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
-import { set } from 'mongoose'
+import { useReducer } from 'react'
+
+
+export const notificationReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET':
+      return action.data
+    case 'CLEAR':
+      return ''
+    default:
+      return state
+  }
+}
+export const userReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET':
+      return action.data
+    case 'CLEAR':
+      return ''
+    default:
+      return state
+  }
+}
+
 
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  //const [blogs, setBlogs] = useState([])
+  const queryClient = useQueryClient()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useReducer(userReducer, null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const [likes, setLikes] = useState('')
-  const [Message, setMessage] = useState(null)
+  const [Message, setMessage] = useReducer(notificationReducer, '')
   const [loginVisible, setLoginVisible] = useState(false)
   const [BlogVisible, setBlogVisible] = useState(false)
 
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        if (window.localStorage.token) {
-          const blogs = await blogService.getAll();
-          sorting(blogs);
-          setBlogs(blogs);
-        }
-      } catch (error) {
-        console.error('Error fetching blogs:', error);
-      }
-    };
-  
-    fetchBlogs();
-  }, []);
+  const removeBlogMutation = useMutation({
+    mutationFn: blogService.remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+    },
+  });
 
-const  sorting = (blogs) => {
+  const updateBlogMutation = useMutation({
+    mutationFn: blogService.update,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+    },
+  });
+
+  const newBlogMutation = useMutation({ 
+    mutationFn: blogService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['blogs']})
+    }
+  })
+
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll
+  })
+
+  if( result.isError ) {
+    return <div>blog service not avaible due problems in server</div>
+  }
+
+  const blogs = result.data
+
+  const updateBlog = async (updatedBlogId) => {
+    console.log('updated blog id', blogs);
+    try {
+      const blogToUpdate = blogs.find((blog) => blog.id === updatedBlogId);
+      const updatedBlog = {
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + 1,  
+      }
+      
+      await updateBlogMutation.mutateAsync({updatedBlog} );
+    } catch (error) {
+      console.error('Error updating blog:', error);
+    }
+  };
+
+  const deleteBlog = async (blogId) => {
+    try {
+      await removeBlogMutation.mutateAsync(blogId);
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+    }
+  }
+
+  const  sorting = (blogs) => {
     blogs.sort((a, b) => b.likes - a.likes)
   }
+
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -53,7 +119,7 @@ const  sorting = (blogs) => {
       window.localStorage.setItem('username', JSON.stringify(user.username))
 
       loginService.setToken(user.token)
-      setUser(user)
+      setUser({ type: 'SET', data: user })
       setUsername('')
       setPassword('')
       const blogs = await blogService.getAll()
@@ -61,57 +127,40 @@ const  sorting = (blogs) => {
       setBlogs(blogs)
       setBlogVisible(false)
     } catch (exception) {
-      setMessage('wrong credentials')
+      setMessage({ type: 'SET', data: 'wrong credentials' })
+
       setTimeout(() => {
-        setMessage(null)
+        setMessage({ type: 'CLEAR' })
       }, 5000)
     }
   }
 
-  const updateBlog = async (updatedBlogId) => {
-    try {
-      const blog = blogs.find((blog) => blog.id === updatedBlogId);
-      console.log('index',blog)
-      const updatedLikes = blog.likes + 1;
-    await setBlogs((prevBlogs) => {
-      const updatedBlogs = [...prevBlogs];
-      const index = updatedBlogs.findIndex((b) => b.id === updatedBlogId);
-      if (index !== -1) {
-        updatedBlogs[index] = { ...updatedBlogs[index], likes: updatedLikes };
-      }
-      sorting(updatedBlogs)
-      return updatedBlogs;
-    });
-      
-    } catch (error) {
-      console.error('Error updating blog:', error);
-    }
-  };
+  
 
   const handleBlog = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     try {
-      const blogObject = await blogService.create({
-        title, author, url
-      })
-      console.log('täää',blogObject)
-      setBlogs(blogs.concat(blogObject))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      setMessage(`Blog ${blogObject.title} added`)
-      setTimeout(() => {
-        setMessage(null)
-      }, 5000)
-      setBlogVisible(false)
-      this.forceRender()
+      const blogObject = {
+        title,
+        author,
+        url,
+      };
+      await newBlogMutation.mutateAsync(blogObject, {
+        onSuccess: () => {
+          setMessage({ type: 'SET', data: `Blog ${blogObject.title} added` });
+          setTimeout(() => {
+            setMessage({ type: 'CLEAR' });
+          }, 5000);
+        },
+      });  
+      setTitle('');
+      setAuthor('');
+      setUrl('');
+      setBlogVisible(false);
+    } catch (exception) {
+      console.error('Error creating blog:', exception);
     }
-    catch (exception) {
-      setTimeout(() => {
-        console.log('error')
-      }, 5000)
-    }
-  }
+  };
 
   const blogForm = () => {
     const hideWhenVisible = { display: BlogVisible ? 'none' : '' }
@@ -146,7 +195,7 @@ const  sorting = (blogs) => {
       window.localStorage.removeItem('token')
       window.localStorage.removeItem('user')
       window.localStorage.removeItem('username')
-      setUser(null)
+      setUser({ type: 'CLEAR' })
       setLoginVisible(false)
 
     } catch (exception) {
@@ -206,7 +255,7 @@ const  sorting = (blogs) => {
 
       <h2>blogs</h2>
       {Array.isArray(blogs) && blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
       )}
 
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import blogService from '../services/blogs'
 
 
-const Blog = ({ blog, updateBlog}) => {
+const Blog = ({ blog, updateBlog, deleteBlog}) => {
   const [BlogVisible, setBlogVisible] = useState(false)
 
   const blogStyle = {
@@ -14,16 +14,13 @@ const Blog = ({ blog, updateBlog}) => {
   }
 
   const addVote = () => {
-    blogService.update(blog.id,{ likes: blog.likes + 1, })
     
     updateBlog(blog.id);
   }
 
-  const deleteBlog = () => {
+  const removeBlog = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      blogService.remove(blog.id)
-      setBlogVisible(false)
-
+      deleteBlog(blog.id);
     }
   }
 
@@ -54,7 +51,7 @@ const Blog = ({ blog, updateBlog}) => {
         <p>User: {blog.user.name}</p>
 
         {JSON.stringify(blog.user.username) === window.localStorage.getItem('username') ? (
-          <p><button onClick={deleteBlog}>Remove</button></p>) : ('')}
+          <p><button onClick={removeBlog}>Remove</button></p>) : ('')}
 
       </div>
 

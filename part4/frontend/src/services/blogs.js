@@ -25,10 +25,11 @@ const create = blog => {
 }
 
 const update = (id, newObject) => {
+  const likes = id.updatedBlog.likes
   const config = {
     headers: { Authorization: 'Bearer ' + JSON.parse(window.localStorage.getItem('token')) },
   }
-  const request = axios.patch(`${baseUrl}/${id}`, newObject, config)
+  const request = axios.patch(`${baseUrl}/${id.updatedBlog.id}`, {likes} , config)
   return request.then(response => response.data)
 }
 
