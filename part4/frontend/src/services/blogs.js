@@ -1,5 +1,6 @@
 import axios from 'axios'
 const baseUrl = 'http://localhost:3001/api/blogs'
+const userUrl = 'http://localhost:3001/api/users'
 
 let token = null
 
@@ -40,4 +41,14 @@ const remove = (id) => {
   const request = axios.delete(`${baseUrl}/${id}`, config)
   return request.then(response => response.data)
 }
-export default { getAll, setToken, create, update,remove }
+const getUsers = () => {
+  const config = {
+    headers: { 'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + JSON.parse(window.localStorage.getItem('token')) },
+  }
+  const request = axios.get(userUrl, config)
+  console.log('user get',request)
+  return request.then(response => response.data)
+}
+
+export default { getAll, setToken, create, update,remove, getUsers }

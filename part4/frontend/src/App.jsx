@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link, useParams, useNavigate
+} from 'react-router-dom'
+import UsersPage from './components/UsersPage'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import { useReducer } from 'react'
-
+import UserPage from './components/UserPage'
 
 export const notificationReducer = (state, action) => {
   switch (action.type) {
@@ -32,13 +36,12 @@ export const userReducer = (state, action) => {
 }
 
 
-
 const App = () => {
   //const [blogs, setBlogs] = useState([])
   const queryClient = useQueryClient()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useReducer(userReducer, null)
+  const [user, setUser] = useReducer(userReducer, '')
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -46,6 +49,25 @@ const App = () => {
   const [Message, setMessage] = useReducer(notificationReducer, '')
   const [loginVisible, setLoginVisible] = useState(false)
   const [BlogVisible, setBlogVisible] = useState(false)
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll
+  })
+
+
+  if( result.isError ) {
+    return <div>blog service not avaible due problems in server</div>
+  }
+  
+  const userResult = useQuery({
+    queryKey: ['users'],
+    queryFn: blogService.getUsers
+  })
+
+
+
+  const users = userResult.data
+  const blogs = result.data   
 
 
   const removeBlogMutation = useMutation({
@@ -68,17 +90,6 @@ const App = () => {
       queryClient.invalidateQueries({queryKey: ['blogs']})
     }
   })
-
-  const result = useQuery({
-    queryKey: ['blogs'],
-    queryFn: blogService.getAll
-  })
-
-  if( result.isError ) {
-    return <div>blog service not avaible due problems in server</div>
-  }
-
-  const blogs = result.data
 
   const updateBlog = async (updatedBlogId) => {
     console.log('updated blog id', blogs);
@@ -185,9 +196,25 @@ const App = () => {
         </div>
       </div>
     )
-
   }
 
+  const Frontpage = () => {
+    return(
+    <div>
+      <h2>add new blog</h2>
+      <Notification message={Message} />
+      {blogForm()}
+
+
+      <h2>blogs</h2>
+      {Array.isArray(blogs) && blogs.map(blog =>
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
+      )}
+
+
+    </div>
+    )
+  }
 
   const handlelogout = (event) => {
     event.preventDefault()
@@ -241,27 +268,18 @@ const App = () => {
   }
   
   return (
+    <Router>
+          <h2>blogs</h2>
+          <p>{JSON.parse(window.localStorage.getItem('user'))} logged in</p>
+          <button type="submit" onClick={handlelogout}>logout</button>
+    <Routes>
+      <Route path='/' element={<Frontpage blogs={blogs}/>} />
+      <Route path='/users' element={<UsersPage users={users}/>} />
+      <Route path='/users/:id' element={<UserPage blogs={blogs}/>} />
 
-    <div>
-      <h2>blogs</h2>
-      <p>{JSON.parse(window.localStorage.getItem('user'))} logged in</p>
-
-      <button type="submit" onClick={handlelogout}>logout</button>
-
-      <h2>add new blog</h2>
-      <Notification message={Message} />
-      {blogForm()}
-
-
-      <h2>blogs</h2>
-      {Array.isArray(blogs) && blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
-      )}
-
-
-    </div>
+    </Routes>
+    </Router>
   )
 }
-
 
 export default App
