@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useCallback } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -13,6 +13,8 @@ import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import { useReducer } from 'react'
 import UserPage from './components/UserPage'
+import BlogPage from './components/BlogPage'
+import e from 'express'
 
 export const notificationReducer = (state, action) => {
   switch (action.type) {
@@ -37,7 +39,6 @@ export const userReducer = (state, action) => {
 
 
 const App = () => {
-  //const [blogs, setBlogs] = useState([])
   const queryClient = useQueryClient()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -49,6 +50,7 @@ const App = () => {
   const [Message, setMessage] = useReducer(notificationReducer, '')
   const [loginVisible, setLoginVisible] = useState(false)
   const [BlogVisible, setBlogVisible] = useState(false)
+  
   const result = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll
@@ -64,14 +66,19 @@ const App = () => {
     queryFn: blogService.getUsers
   })
 
-
-
   const users = userResult.data
   const blogs = result.data   
 
 
   const removeBlogMutation = useMutation({
     mutationFn: blogService.remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+    },
+  });
+
+  const commentBlogMutation = useMutation({
+    mutationFn: blogService.comment,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
     },
@@ -118,6 +125,18 @@ const App = () => {
     blogs.sort((a, b) => b.likes - a.likes)
   }
 
+  const commentBlog = async (blogId, comment) => {
+    const comments = {
+      comment,
+      blogId
+    }
+    try {
+      await commentBlogMutation.mutateAsync(comments);
+    }
+    catch (error) {
+      console.error('Error commenting blog:', error);
+    }
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -146,8 +165,6 @@ const App = () => {
     }
   }
 
-  
-
   const handleBlog = async (event) => {
     event.preventDefault();
     try {
@@ -156,6 +173,7 @@ const App = () => {
         author,
         url,
       };
+      
       await newBlogMutation.mutateAsync(blogObject, {
         onSuccess: () => {
           setMessage({ type: 'SET', data: `Blog ${blogObject.title} added` });
@@ -182,16 +200,18 @@ const App = () => {
           <button className='newBlog' onClick={() => setBlogVisible(true)}>create new</button>
         </div>
         <div style={showWhenVisible}>
+
           <BlogForm
+            key="blogform"
             title={title}
             author={author}
             url={url}
-            handleTitleChange={({ target }) => setTitle(target.value)}
-            handleAuthorChange={({ target }) => setAuthor(target.value)}
-            handleUrlChange={({ target }) => setUrl(target.value)}
+            handleTitleChange={( {target }) => setTitle(target.value)}
+            handleAuthorChange={( {target }) => setAuthor(target.value)}
+            handleUrlChange={( {target} ) => setUrl(target.value)}
             handleSubmit={handleBlog}
           />
-          
+
           <button onClick={() => setBlogVisible(false)}>cancel</button>
         </div>
       </div>
@@ -200,19 +220,22 @@ const App = () => {
 
   const Frontpage = () => {
     return(
+
     <div>
+      <div id="addBlog">
       <h2>add new blog</h2>
       <Notification message={Message} />
       {blogForm()}
 
-
+    </div>
+    <div id="blogs">
       <h2>blogs</h2>
       {Array.isArray(blogs) && blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
+        <Link key={blog.id} to={`/blogs/${blog.id}`}><Blog key={blog.id} blog={blog}  /></Link>
       )}
-
-
     </div>
+    </div>
+
     )
   }
 
@@ -251,9 +274,8 @@ const App = () => {
         </div>
       </div>
     )
-
-
   }
+
   
   if (window.localStorage.token === null || window.localStorage.token === undefined) {
 
@@ -269,14 +291,16 @@ const App = () => {
   
   return (
     <Router>
+          <Link to='/'>blogs </Link>
+          <Link to='/users'>users</Link>
           <h2>blogs</h2>
           <p>{JSON.parse(window.localStorage.getItem('user'))} logged in</p>
           <button type="submit" onClick={handlelogout}>logout</button>
     <Routes>
       <Route path='/' element={<Frontpage blogs={blogs}/>} />
       <Route path='/users' element={<UsersPage users={users}/>} />
-      <Route path='/users/:id' element={<UserPage blogs={blogs}/>} />
-
+      <Route path='/users/:id' element={<UserPage blogs={blogs} users={users}/>} />
+      <Route path='/blogs/:id' element={<BlogPage blogs={blogs} updateBlog={updateBlog} deleteBlog={deleteBlog} comment={commentBlog}/>} />
     </Routes>
     </Router>
   )

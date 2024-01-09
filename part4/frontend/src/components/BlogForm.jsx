@@ -9,31 +9,46 @@ const BlogForm = ({
   author,
   url
 }) => {
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
         <div>
         title
-          <input className='title'
+          <input 
+            type='text'
+            id='title'
+            key='title'
+            className='title'
             value={title}
             onChange={handleTitleChange}
+
           />
         </div>
         <div>
         author
-          <input className='author'
+          <input 
+            type='text'
+            id='author'
+            key='author'
+            className='author'
             value={author}
             onChange={handleAuthorChange}
+
           />
         </div>
         <div>
         url
-          <input className='url'
+          <input 
+            type='text'
+            id='url'
+            key='url'
+            className='url'
             value={url}
             onChange={handleUrlChange}
           />
         </div>
-        <button className='create' type="submit" >create</button>
+        <button id='create' className='create' type="submit" >create</button>
       </form>
     </div>
   )

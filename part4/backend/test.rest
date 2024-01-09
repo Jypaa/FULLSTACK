@@ -59,6 +59,14 @@ Content-Type: application/json
     "name": "Jyri",
     "password": "salainen"
 }
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username":"Jypatest",
+    "password": "salainen"
+}
 
 ###
 
@@ -68,6 +76,15 @@ Content-Type: application/json
 {
     "username":"Jypa",
     "password": "salainen"
+}
+
+###
+POST http://localhost:3001/api/blogs/659ad9015282af941521fd87/comments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikp5cGF0ZXN0IiwiaWQiOiI2NTlkNTJjOTRmN2UwM2VlYWYwNTdmYzEiLCJpYXQiOjE3MDQ4MTM1NjEsImV4cCI6MTcwNDgxNzE2MX0.P7I-FvapZdTqPYeqKmYYqkLtqhuXXo31G1RaLY0ERbQ
+
+{
+    "comment": "test comment"
 }
 
 ###

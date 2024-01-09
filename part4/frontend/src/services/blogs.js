@@ -34,6 +34,15 @@ const update = (id, newObject) => {
   return request.then(response => response.data)
 }
 
+const comment = (id, newObject) => {
+  const comments = id.comment
+  const config = {
+    headers: { Authorization: 'Bearer ' + JSON.parse(window.localStorage.getItem('token')) },
+  }
+  const request = axios.post(`${baseUrl}/${id.blogId}/comments`, {comments} , config)
+  return request.then(response => response.data)
+}
+
 const remove = (id) => {
   const config = {
     headers: { Authorization: 'Bearer ' + JSON.parse(window.localStorage.getItem('token')) },
@@ -47,8 +56,7 @@ const getUsers = () => {
       'Authorization': 'Bearer ' + JSON.parse(window.localStorage.getItem('token')) },
   }
   const request = axios.get(userUrl, config)
-  console.log('user get',request)
   return request.then(response => response.data)
 }
 
-export default { getAll, setToken, create, update,remove, getUsers }
+export default { getAll, setToken, create, update,remove, getUsers, comment }

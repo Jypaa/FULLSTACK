@@ -3,7 +3,6 @@ import {
     Routes, Route, Link, useParams, useNavigate
   } from 'react-router-dom'
 
-
 const UserPage = (blogs) => {
     const id = useParams().id   
     if (!id || blogs.blogs === undefined) {
@@ -12,22 +11,26 @@ const UserPage = (blogs) => {
     }
 
 
-console.log('blogs', blogs)
-console.log('id', id)
-//const usersBlogs = blogs.filter(blog => blog.user.id === id)
-//console.log('usersBlogs', usersBlogs)
-        
-        
-        return (
-          <div>
-            <tbody>
+  const user = blogs.users.find(user => user.id === id)
+  if(!user) {
+    return null
+  }
+  return (
+    <div>
+      <h1>{user.username}</h1>
+      <h2>added blogs</h2>  
+      
+      <table>    
+        <tbody>
+          {blogs.blogs.map(blog =>
+            <tr key={blog.id}>
+              <td>{blog.title}</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
 
-
-
-
-            </tbody>
-
-        </div>
-        )
-      }
+    </div>
+  )
+}
 export default UserPage
