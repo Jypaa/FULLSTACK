@@ -14,7 +14,6 @@ import BlogForm from './components/BlogForm'
 import { useReducer } from 'react'
 import UserPage from './components/UserPage'
 import BlogPage from './components/BlogPage'
-import e from 'express'
 
 export const notificationReducer = (state, action) => {
   switch (action.type) {
@@ -191,7 +190,9 @@ const App = () => {
     }
   };
 
+
   const blogForm = () => {
+
     const hideWhenVisible = { display: BlogVisible ? 'none' : '' }
     const showWhenVisible = { display: BlogVisible ? '' : 'none' }
     return (
@@ -201,13 +202,13 @@ const App = () => {
         </div>
         <div style={showWhenVisible}>
 
-          <BlogForm
+        <BlogForm
             key="blogform"
             title={title}
             author={author}
             url={url}
-            handleTitleChange={( {target }) => setTitle(target.value)}
-            handleAuthorChange={( {target }) => setAuthor(target.value)}
+            handleTitleChange={( {target} ) => setTitle(target.value)}
+            handleAuthorChange={( {target} ) => setAuthor(target.value)}
             handleUrlChange={( {target} ) => setUrl(target.value)}
             handleSubmit={handleBlog}
           />
@@ -269,6 +270,7 @@ const App = () => {
             handleUsernameChange={({ target }) => setUsername(target.value)}
             handlePasswordChange={({ target }) => setPassword(target.value)}
             handleSubmit={handleLogin}
+            
           />
           <button onClick={() => setLoginVisible(false)}>cancel</button>
         </div>

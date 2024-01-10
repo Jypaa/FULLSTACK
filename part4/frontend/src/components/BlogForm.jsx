@@ -12,7 +12,7 @@ const BlogForm = ({
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form >
         <div>
         title
           <input 
@@ -22,7 +22,6 @@ const BlogForm = ({
             className='title'
             value={title}
             onChange={handleTitleChange}
-
           />
         </div>
         <div>
@@ -34,7 +33,6 @@ const BlogForm = ({
             className='author'
             value={author}
             onChange={handleAuthorChange}
-
           />
         </div>
         <div>
@@ -48,7 +46,7 @@ const BlogForm = ({
             onChange={handleUrlChange}
           />
         </div>
-        <button id='create' className='create' type="submit" >create</button>
+        <button onClick={handleSubmit} id='create' className='create' type="submit" >create</button>
       </form>
     </div>
   )
