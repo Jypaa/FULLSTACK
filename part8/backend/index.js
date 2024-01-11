@@ -111,7 +111,7 @@ const typeDefs = `
     type Query {
         bookCount: Int!
         authorCount: Int!
-        allBooks(author: String, genre: String): [Book!]!
+        allBooks(author: String, genres: String): [Book!]!
         allAuthors: [Author!]!
     },
     type Mutation {  
@@ -119,7 +119,7 @@ const typeDefs = `
             title: String!
             published: Int!
             author: String!
-            genres: [String!]
+            genres: [String]
         ): Book
         editAuthor(
             name: String!
@@ -167,9 +167,12 @@ const resolvers = {
         addBook: (root, args) => {
             const book = { ...args, id: uuid() };
             books = books.concat(book);
-            if (!authors.includes(args.author)) {
-                const author = { name: args.author, id: uuid() };
-                authors = authors.concat(author);
+
+            const authorExists = authors.some(author => author.name === args.author);
+
+            if (!authorExists) {
+                const newAuthor = { name: args.author, id: uuid() };
+                authors = authors.concat(newAuthor);
             }
             return book;
             },
