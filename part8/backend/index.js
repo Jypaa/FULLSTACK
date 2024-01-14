@@ -1,6 +1,25 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const { v4: uuid } = require('uuid');
+const mongoose = require('mongoose')
+const Author = require('./schema/AuthorSchema')
+const Book = require('./schema/BookSchema')
+const express = require('express')
+const cors = require("cors");
+const app = express()
+require('dotenv').config()
+const URL = process.env.MONGODB_URI
+app.use(express.json())
+
+
+app.use(cors());
+  mongoose.connect(URL)
+    .then(() => {
+      console.log('connected to MongoDB')
+    })
+    .catch((error) => {
+      console.log('error connecting to MongoDB:', error.message)
+    })
 
 let authors = [
   {
@@ -28,19 +47,6 @@ let authors = [
   },
 ]
 
-/*
- * Suomi:
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
- *
- * English:
- * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
- * However, for simplicity, we will store the author's name in connection with the book
- *
- * Spanish:
- * Podría tener más sentido asociar un libro con su autor almacenando la id del autor en el contexto del libro en lugar del nombre del autor
- * Sin embargo, por simplicidad, almacenaremos el nombre del autor en conección con el libro
-*/
 
 let books = [
   {
@@ -98,9 +104,9 @@ const typeDefs = `
     type Book {
         title: String!
         published: Int!
-        author: String!
-        id: String!
+        author: Author!
         genres: [String!]!
+        id: ID!
     },
     type Author {
         name: String!
@@ -133,12 +139,21 @@ const resolvers = {
     Query: {
         bookCount : () => books.length, 
         authorCount : () => authors.length,
-        allBooks: (root, args) => {
-            if (args.author) {
-                return books.filter((book) => book.author === args.author);
+        allBooks: async (root, args) => {
+          console.log(args)
+          console.log(args.author)
+          console.log(args.genres)
+
+          let name = args.author
+
+            if (args.author && !args.genres) {
+              console.log(args.author)
+              let books = await Book.find({}).populate("author");
+                return books
               }
-            if (args.author && args.genre) {
-                return books.filter((book) => book.author === args.author && book.genres.includes(args.genre));
+            if (args.author && args.genres) {          
+              let books = await Book.find({}).populate("author").populate("genres");
+                return books
             }
             return books;
     },
@@ -164,18 +179,28 @@ const resolvers = {
       },
     },
     Mutation: {
-        addBook: (root, args) => {
-            const book = { ...args, id: uuid() };
-            books = books.concat(book);
-
-            const authorExists = authors.some(author => author.name === args.author);
-
-            if (!authorExists) {
-                const newAuthor = { name: args.author, id: uuid() };
-                authors = authors.concat(newAuthor);
-            }
-            return book;
-            },
+      addBook: async (root, args) => {
+        // Find or create the author
+        let author = await Author.findOne({ name: args.author });
+    
+        if (!author) {
+          author = new Author({ name: args.author });
+          await author.save();
+        }
+    
+        // Create the book with the author's ObjectId
+        const book = new Book({ ...args, author: author});
+    
+        try {
+          // Save the book to the database
+          await book.save();
+        } catch (error) {
+          console.error("Error saving book:", error.message);
+          throw new Error("Failed to save the book.");
+        }
+    
+        return book;
+      },
             
         editAuthor: (root, args) => {
             const author = authors.find((author) => author.name === args.name);
