@@ -16,7 +16,6 @@ const ADD_BORN_YEAR = gql`
 const Authors = (props) => {
   const [selectedAuthor, setSelectedAuthor] = useState('');
   const [bornYear, setBornYear] = useState('');
-
   const [addBornYear] = useMutation(ADD_BORN_YEAR)
 
   const handleAuthorChange = (event) => {
@@ -38,9 +37,30 @@ const Authors = (props) => {
     setBornYear(event.target.value);
   };
 
-
-
-
+  if(!props.token) {
+    return (
+      <div>
+        <h2>authors</h2>
+        <table>
+          <tbody>
+            <tr>
+              <th></th>
+              <th>born</th>
+              <th>books</th>
+            </tr>
+            {authors.map((a) => (
+              <tr key={a.id}>
+                <td>{a.name}</td>
+                <td>{a.born}</td>
+                <td>{a.bookCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+  else{
   return (
     <div>
       <h2>authors</h2>
@@ -79,6 +99,7 @@ const Authors = (props) => {
       </label>
     </div>
   )
+          }
 }
 
 export default Authors
