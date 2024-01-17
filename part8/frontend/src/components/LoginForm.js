@@ -16,7 +16,7 @@ const Login = (props) => {
         console.log(result.data)
       const token = result.data.login.value
       props.setToken(token)
-      localStorage.setItem('phonenumbers-user-token', token)
+      localStorage.setItem('book-user-token', token)
     }
   }, [result.data, props])
 

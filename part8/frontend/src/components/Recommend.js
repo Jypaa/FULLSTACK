@@ -7,8 +7,6 @@ const Books = (props) => {
   const[genre, setGenres] = useState([])
   const { loading, error, data } = useQuery(ME);
   
-  console.log(props)
-  console.log(data)
 
   useEffect(() => {
     if (data) {

@@ -2,23 +2,55 @@ import { useState } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
-import {gql, useQuery, useApolloClient } from '@apollo/client'
+import {gql, useQuery, useApolloClient, useSubscription } from '@apollo/client'
 import Login from './components/LoginForm'
 import Recommed from './components/Recommend'
-import { QUERY } from './queries'
+import { BOOK_ADDED, ALL_BOOKS, QUERY } from './queries'
 
 
- 
+export const updateCache = (cache, query, addedBook) => {
+
+  const uniqByName = (a) => {
+    let seen = new Set()
+    return a.filter((item) => {
+      let k = item.name
+      return seen.has(k) ? false : seen.add(k)
+    })
+  }
+
+  cache.updateQuery(query, ({ allBooks }) => {
+    return {
+      allBooks: uniqByName(allBooks.concat(addedBook)),
+    }
+  })
+}
+
 
 const App = () => {
-  const [page, setPage] = useState('authors')
-  const [token, setToken] = useState(null)
-
-  const client = useApolloClient()
-  console.log(client)
-    const result = useQuery(QUERY, {
+  const result = useQuery(QUERY, {
       pollInterval: 5000
     })
+  const [page, setPage] = useState('authors')
+  const [token, setToken] = useState(null)
+  const client = useApolloClient()
+
+    useSubscription(BOOK_ADDED, {
+      onData: ({ data }) => {
+        const addedBook = data.data.bookAdded
+        alert(`${addedBook.title} added`)
+
+        client.cache.updateQuery({query: ALL_BOOKS }, ({ allBooks }) => {
+          return {
+            allBooks: allBooks.concat(addedBook),
+          }
+        })
+      }
+    })
+    const logout = () => {
+      setToken(null)
+      localStorage.clear()
+      client.resetStore()
+    }
 
     if (result.loading)  {
       return <div>loading...</div>
@@ -29,11 +61,7 @@ const App = () => {
     }
     console.log(result.data)
 
-    const logout = () => {
-      setToken(null)
-      localStorage.clear()
-      client.resetStore()
-    }
+    
   
     if (!token) {
       return (

@@ -1,54 +1,34 @@
 import {  useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { FILTEREDBOOKS } from '../queries'
-import { set } from 'mongoose'
+import { ALL_BOOKS, FILTEREDBOOKS } from '../queries'
+import { ref } from 'vue'
+import { all } from 'axios'
 
 
 const Books = (props) => {
   const[books, setBooks] = useState(props.books)
   const[genre, setGenres] = useState([])
-  const { loading, error, data } = useQuery(FILTEREDBOOKS, {variables: {genres: genre}});
+  const { loading, error, data} = useQuery(FILTEREDBOOKS, {variables: {genres: genre}});
   
-  console.log(props)
-
-  console.log(books)
   const genres = books.map(book => book.genres).flat()
   let unique = genres.filter((item, i, ar) => ar.indexOf(item) === i);
-  console.log(unique)
 
   useEffect(() => {
     if(data){
       setBooks(data.allBooks)
-    }
-    
+    }  
   }
   ,[data])
     
 
-const setGenre = async (genre) => {
-  await setGenres(genre)
-  console.log(genre)
-
-  console.log(data)
-}
-
-/*
-const setGenre = (genre) => {
-  setGenres(genre)
-  console.log(genre)
-  if(genre === "") {
-    setBooks(props.books)
+  const setGenre = (genre) => {
+    setGenres(genre)
   }
-  else{
-    let booksFiltered = props.books.filter(book => book.genres.includes(genre))
-    setBooks(booksFiltered)
-  }
-}
 
-*/
 if (!props.show) {
     return null
   }
+
   return (
     <div>
       <h2>books</h2>
