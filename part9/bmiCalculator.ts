@@ -1,8 +1,8 @@
 
-const weight: number = parseFloat(process.argv[2]);
-const height: number = parseFloat(process.argv[3]);
+//const weight: number = parseFloat(process.argv[2]);
+//const height: number = parseFloat(process.argv[3]);
 
-const BMICALCULATOR = ( height: number,weight: number): string => { 
+export const BMICALCULATOR = ( height: number,weight: number): string => { 
     const bmi = weight / (height * height /10000);
     if (bmi < 18.5) {
         return 'Underweight';
@@ -16,6 +16,8 @@ const BMICALCULATOR = ( height: number,weight: number): string => {
     else {
         return 'Obesity';
     }
-}
+};
 
-console.log(BMICALCULATOR( height, weight));
+
+
+//console.log(BMICALCULATOR( height, weight));

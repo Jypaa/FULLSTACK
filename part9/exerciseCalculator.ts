@@ -1,3 +1,4 @@
+
 interface ExerciseValues {
     periodLength: number;
     trainingDays: number;
@@ -8,15 +9,15 @@ interface ExerciseValues {
     average: number;
     }
 
-const days = []
-const target: number = parseFloat(process.argv[2])
+const days = [];
+//const target: number = parseFloat(process.argv[2]);
 
 for (let i = 3; i < process.argv.length; i++) {
-    days.push(parseFloat(process.argv[i]))
+    days.push(parseFloat(process.argv[i]));
 }
-const ExerciseValues = (args: Array<number>, target: number):  ExerciseValues => {
+export const ExerciseValues = (args: Array<number>, target: number):  ExerciseValues => {
     const sum = args.reduce((a, b) => a + b, 0);
-    const average = sum / args.length
+    const average = sum / args.length;
     let rating = 1;
     let ratingDescription = 'bad';
     if (average >= target) {
@@ -47,8 +48,8 @@ const ExerciseValues = (args: Array<number>, target: number):  ExerciseValues =>
         target: target,
         average: average,
     };
-}
+};
 
 
-console.log(ExerciseValues(days, target))
+//console.log(ExerciseValues(days, target));
 
