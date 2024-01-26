@@ -41,6 +41,45 @@ app.get('/api/patients/:id', (req, res) => {
 } 
 )
 
+app.post('/api/patients/:id/entries', (req, res) => {
+  console.log(req.body);
+  const patient = patients.find((patient) => patient.id === req.params.id);
+  if (!patient) {
+    res.status(404).send('Patient not found');
+    return;
+  }
+  const newEntry = {
+    id: uuidv4(),
+    ...req.body,
+  };
+  if(newEntry.type === 'HealthCheck') {
+    if(!newEntry.type || !newEntry.date || !newEntry.specialist) {
+      res.status(400).send('Missing parameters');
+      return;
+    }
+    if(newEntry.healthCheckRating < 0 || newEntry.healthCheckRating > 3) {
+      res.status(400).send('Invalid health check rating');
+      return;
+    }
+  }
+  if(newEntry.type === 'OccupationalHealthcare') {
+    if(!newEntry.type || !newEntry.date || !newEntry.specialist || !newEntry.employerName) {
+      res.status(400).send('Missing parameters');
+      return;
+    }
+  }
+  if(newEntry.type === 'Hospital') {
+    if(!newEntry.type || !newEntry.date || !newEntry.specialist || !newEntry.discharge.date || !newEntry.discharge.criteria) {
+      res.status(400).send('Missing parameters');
+      return;
+    }
+    
+  }
+
+  (patient.entries as any[]).push(newEntry);
+  res.send(newEntry);
+});
+
 app.post('/api/patients', (req, res) => {
   const newPatient = {
     id: uuidv4(),

@@ -1,8 +1,12 @@
 
+type NonSensitiveHospitalEntry = Omit<HospitalEntry, 'ssn'>;
+type NonSensitiveOccupationalHealthcareEntry = Omit<OcuupationalHealthcareEntry, 'ssn'>;
+type NonSensitiveHealthCheckEntry = Omit<HealthCheckEntry, 'ssn'>;
+
 export type Entry =
-    | HospitalEntry
-    | OcuupationalHealthcareEntry
-    | HealthCheckEntry;
+    | NonSensitiveHospitalEntry
+    | NonSensitiveOccupationalHealthcareEntry
+    | NonSensitiveHealthCheckEntry;
 
 
 export enum Gender  {
@@ -65,4 +69,4 @@ export type HospitalEntry = BaseEntry & {
     };
 };
 
-export type NonSensitivePatient = Omit<Patient, 'ssn'>;
+export type NonSensitivePatient = Omit<Patient, 'ssn'> & { entries?: Entry[] };
