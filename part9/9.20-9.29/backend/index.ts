@@ -58,7 +58,7 @@ app.post('/api/patients/:id/entries', (req, res) => {
       return;
     }
     if(newEntry.healthCheckRating < 0 || newEntry.healthCheckRating > 3) {
-      res.status(400).send('Invalid health check rating');
+      res.status(400).send('Invalid health check rating (0-3)');
       return;
     }
   }

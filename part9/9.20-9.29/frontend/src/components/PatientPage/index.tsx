@@ -112,7 +112,7 @@ const EntryHeader = ({ entry } : { entry: any }) => {
   }
 }
 
-const PatientPage = ({ patients , diagnoses, setPatients} : Props) => {
+const PatientPage = ({ patients , diagnoses, setPatients,} : Props) => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const entries = {
@@ -156,14 +156,14 @@ const PatientPage = ({ patients , diagnoses, setPatients} : Props) => {
         }
         return <div></div>
       };
-
+    
     return(
         <div>
 
             {patient && <h1>{patient.name}{getIcon()}</h1>}
             {patient && <p>ssn: {patient.ssn}</p>}
             {patient && <p>occupation: {patient.occupation}</p>}
-            {modalOpen ? <AddPatientEntryModal modalOpen={modalOpen} onClose={() => setModalOpen(!modalOpen)} onSubmit={() => console.log("submit")} /> : <div></div>}
+            {modalOpen ? <AddPatientEntryModal modalOpen={modalOpen} onClose={() => setModalOpen(!modalOpen)} onSubmit={() => console.log("submit")}  diagnoses={diagnoses}/> : <div></div>}
             <h2>entries</h2>
             {patient && patient.entries.map((entry) => (
                 <div key={entry.id} style={entries}>
@@ -184,6 +184,8 @@ const PatientPage = ({ patients , diagnoses, setPatients} : Props) => {
             modalOpen={modalOpen}
             onSubmit={submitNewPatientEntry}
             onClose={() => setModalOpen(!modalOpen)}
+            diagnoses={diagnoses}
+        
           />
             <Button variant="contained" onClick={() => setModalOpen(!modalOpen)}>add new entry</Button>
         </div>

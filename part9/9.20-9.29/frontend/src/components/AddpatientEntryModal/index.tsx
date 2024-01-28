@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle, DialogContent, Divider } from '@mui/material';
-import { EntryFormValues } from "../../types";
+import { Diagnosis, EntryFormValues } from "../../types";
 
 import AddPatientEntryForm from "./AddPatientEntryForm";
 
@@ -8,15 +8,16 @@ interface Props {
         onClose: () => void;
         onSubmit: (values: EntryFormValues) => void;
         error?: string;
+        diagnoses: Array<Diagnosis>;
     }
 
 
-const AddPatientEntryModal = ({ modalOpen, onClose, onSubmit }: Props) => (
+const AddPatientEntryModal = ({ modalOpen, onClose, onSubmit, diagnoses }: Props) => (
         <Dialog fullWidth={true} open={modalOpen} onClose={() => onClose()}>
                 <DialogTitle>Add a new entry</DialogTitle>
                 <Divider />
                 <DialogContent>
-            <AddPatientEntryForm onSubmit={onSubmit} onCancel={onClose}/>
+            <AddPatientEntryForm onSubmit={onSubmit} onCancel={onClose} diagnoses={diagnoses}/>
         </DialogContent>
     </Dialog>
 

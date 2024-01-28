@@ -1,17 +1,31 @@
 import { SyntheticEvent, useState } from "react";
 
-import {  TextField, InputLabel, MenuItem, Select, Grid, Button} from '@mui/material';
-import { EntryFormValues } from "../../types";
+import {  TextField, InputLabel, MenuItem, Select, Grid, Button, OutlinedInput, Checkbox, ListItemText, FormControl,SelectChangeEvent} from '@mui/material';
+import { Diagnosis, EntryFormValues } from "../../types";
 
 interface Props {
     onCancel: () => void;
     onSubmit: (values: EntryFormValues) => void;
+    diagnoses: Array<Diagnosis>;
 
   }
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+      PaperProps: {
+        style: {
+          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+          width: 250,
+        },
+      },
+    };
 
-
-const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
-    const [diagnoses, setDiagnoses] = useState<string[]>([]);
+const AddPatientEntryForm = ({ onSubmit, onCancel, diagnoses}: Props) => {
+    
+    const [inputTypeStart, setInputTypeStart] = useState('text');
+    const [inputTypeEnd, setInputTypeEnd] = useState('text');
+    const [diagnosesCodes, _setDiagnosesCodes] = useState(diagnoses);
+    const [Patientdiagnoses, PatientsetDiagnoses] = useState<string[]>([]);
     const [type, setType] = useState('HealthCheck');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState('');
@@ -25,12 +39,35 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
     const [endDate, setSickLeaveEndDate] = useState('');
 
 
+    const handleFocusStart = () => {
+        setInputTypeStart('date');
+      };
+    
+    const handleBlurStart = () => {
+        setInputTypeStart('text');
+    };
+    const handleFocusEnd = () => {
+        setInputTypeEnd('date');
+    };
+    const handleBlurEnd = () => {
+        setInputTypeEnd('text');
+    }
+
+    const handleChange = (event: SelectChangeEvent<typeof Patientdiagnoses>) => {
+        const {
+          target: { value },
+        } = event;
+        PatientsetDiagnoses(
+          typeof value === 'string' ? value.split(',') : value,
+        );
+      };
+
 
     const addpatientEntry = (event: SyntheticEvent) => {
         if (type === 'HealthCheck'){
             event.preventDefault();
             onSubmit({
-                diagnosisCodes: diagnoses,
+                diagnosisCodes: Patientdiagnoses,
                 description,
                 date,
                 specialist,
@@ -42,7 +79,7 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
         if (type === 'Hospital'){
             event.preventDefault();
             onSubmit({
-                diagnosisCodes: diagnoses,
+                diagnosisCodes: Patientdiagnoses,
                 description,
                 date,
                 specialist,
@@ -56,7 +93,7 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
         if (type === 'OccupationalHealthcare'){
             event.preventDefault();
             onSubmit({
-                diagnosisCodes: diagnoses,
+                diagnosisCodes: Patientdiagnoses,
                 description,
                 date,
                 specialist,
@@ -70,6 +107,7 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
             }
         }
         if(type === 'OccupationalHealthcare'){
+            console.log(diagnosesCodes)
             return(
                 <div>
                     <form onSubmit={addpatientEntry}>
@@ -98,7 +136,8 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    label="Date"
+                                
+                                    type="date"
                                     fullWidth 
                                     value={date}
                                     onChange={({ target }) => setDate(target.value)}
@@ -113,12 +152,27 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    label="Diagnoses codes"
-                                    fullWidth 
-                                    
-                                    onChange={({ target }) => setDiagnoses(target.value.split(','))}
-                                />
+                            <FormControl sx={{ width: 1 }}>
+                                <InputLabel id="demo-multiple-checkbox-label">Codes</InputLabel>
+                                    <Select
+                                        labelId="demo-multiple-checkbox-label"
+                                        id="demo-multiple-checkbox"
+                                        multiple
+                              
+                                        value={Patientdiagnoses}
+                                        onChange={handleChange}
+                                        input={<OutlinedInput label="Codes" />}
+                                        renderValue={(selected) => selected.join(', ')}
+                                        MenuProps={MenuProps}
+                                    >
+                                    {diagnosesCodes.map((diagnosis) => (
+                                        <MenuItem key={diagnosis.code} value={diagnosis.code}>
+                                            <Checkbox checked={Patientdiagnoses.indexOf(diagnosis.code) > -1} />
+                                            <ListItemText primary={diagnosis.code} />
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
@@ -129,10 +183,13 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                                     />
                             </Grid>
                             <Grid>
+
                                 <TextField
                                     label="sickleaveStartDate"
-                                    fullWidth 
-                                    
+                                    fullWidth
+                                    type={inputTypeStart}
+                                    onFocus={handleFocusStart}
+                                    onBlur={handleBlurStart}
                                     onChange={({ target }) => setSickLeaveStartDate(target.value)}
                                     />
                             </Grid>
@@ -140,7 +197,9 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                                 <TextField
                                     label="sickleaveEndDate"
                                     fullWidth 
-                                    
+                                    type={inputTypeEnd}
+                                    onFocus={handleFocusEnd}
+                                    onBlur={handleBlurEnd}
                                     onChange={({ target }) => setSickLeaveEndDate(target.value)}
                                     />
                             </Grid>
@@ -182,8 +241,9 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    label="Date"
+                                    
                                     fullWidth 
+                                    type="date"
                                     value={date}
                                     onChange={({ target }) => setDate(target.value)}
                                 />
@@ -196,19 +256,34 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                                     onChange={({ target }) => setSpecialist(target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Codes"
-                                    fullWidth 
-                                    
-                                    onChange={({ target }) => setDiagnoses(target.value.split(','))}
-                                />
-                            </Grid>
+                            <FormControl sx={{ width: 1 }}>
+                                <InputLabel id="demo-multiple-checkbox-label">Codes</InputLabel>
+                                    <Select
+                                        labelId="demo-multiple-checkbox-label"
+                                        id="demo-multiple-checkbox"
+                                        multiple
+                              
+                                        value={Patientdiagnoses}
+                                        onChange={handleChange}
+                                        input={<OutlinedInput label="Codes" />}
+                                        renderValue={(selected) => selected.join(', ')}
+                                        MenuProps={MenuProps}
+                                    >
+                                    {diagnosesCodes.map((diagnosis) => (
+                                        <MenuItem key={diagnosis.code} value={diagnosis.code}>
+                                            <Checkbox checked={Patientdiagnoses.indexOf(diagnosis.code) > -1} />
+                                            <ListItemText primary={diagnosis.code} />
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                             <Grid>
                                 <TextField
                                     label="DischargeDate"
                                     fullWidth 
-             
+                                    type={inputTypeStart}
+                                    onFocus={handleFocusStart}
+                                    onBlur={handleBlurStart}
                                     onChange={({ target }) => setDischargeDate(target.value) }
                                     />
                             </Grid>
@@ -216,7 +291,7 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                                 <TextField
                                     label="DischargeCriteria"
                                     fullWidth 
-                                 
+                                    type="text"
                                     onChange={({ target }) => setCriteria(target.value)}
                                     />
                             </Grid>
@@ -259,8 +334,9 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                label="Date"
+                            
                                 fullWidth 
+                                type="date"
                                 value={date}
                                 onChange={({ target }) => setDate(target.value)}
                             />
@@ -273,14 +349,27 @@ const AddPatientEntryForm = ({ onSubmit, onCancel}: Props) => {
                                 onChange={({ target }) => setSpecialist(target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                label="Codes"
-                                fullWidth 
-                                
-                                onChange={({ target }) => setDiagnoses(target.value.split(','))}
-                            />
-                        </Grid>
+                        <FormControl sx={{ width: 1 }}>
+                                <InputLabel id="demo-multiple-checkbox-label">Codes</InputLabel>
+                                    <Select
+                                        labelId="demo-multiple-checkbox-label"
+                                        id="demo-multiple-checkbox"
+                                        multiple
+                              
+                                        value={Patientdiagnoses}
+                                        onChange={handleChange}
+                                        input={<OutlinedInput label="Codes" />}
+                                        renderValue={(selected) => selected.join(', ')}
+                                        MenuProps={MenuProps}
+                                    >
+                                    {diagnosesCodes.map((diagnosis) => (
+                                        <MenuItem key={diagnosis.code} value={diagnosis.code}>
+                                            <Checkbox checked={Patientdiagnoses.indexOf(diagnosis.code) > -1} />
+                                            <ListItemText primary={diagnosis.code} />
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         <Grid>
                             <TextField
                                 label="HealthCheckRating"
